@@ -215,8 +215,8 @@ const AnalyticsDashboard = () => {
                 color="#3a9391"
               />
               <StatCard
-                title="Flows Created"
-                value={analyticsData.flows_created}
+                title="Total Unrecognised Documents"
+                value={analyticsData.total_unrecognised_documents}
                 icon={TrendingUp}
                 color="#3a9391"
               />
@@ -249,6 +249,20 @@ const AnalyticsDashboard = () => {
                   icon={FileText}
                   color="#3a9391"
                 />
+              </div>
+            )}
+
+            {/* Flows Metrics */}
+            {(analyticsData.flows_created !== undefined || analyticsData.total_unrecognised_documents !== undefined) && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                {analyticsData.flows_created !== undefined && (
+                  <StatCard
+                    title="Flows Created"
+                    value={analyticsData.flows_created}
+                    icon={TrendingUp}
+                    color="#3a9391"
+                  />
+                )}
               </div>
             )}
 
