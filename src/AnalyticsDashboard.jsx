@@ -197,8 +197,8 @@ const AnalyticsDashboard = () => {
             {/* Key Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               <StatCard
-                title="Total Documents Processed"
-                value={analyticsData.total_documents_processed}
+                title="Successfully Processed Docs"
+                value={analyticsData.all_successful_documents_processed}
                 icon={FileText}
                 color="#3a9391"
               />
