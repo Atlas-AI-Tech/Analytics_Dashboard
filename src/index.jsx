@@ -4,6 +4,7 @@ import './index.css'
 import App from './App.jsx'
 import AnalyticsDashboard from './AnalyticsDashboard.jsx'
 import FieldwiseAnalyticsDashboard from './FieldwiseAnalyticsDashboard.jsx'
+import LatencyTracker from './LatencyTracker.jsx'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 
@@ -19,6 +20,11 @@ const appRouter = createBrowserRouter([
       {
         path: "/fieldwise-analytics",
         element: <FieldwiseAnalyticsDashboard />,
+      }
+      ,
+      {
+        path: "/api-latency-tracker",
+        element: <LatencyTracker />,
       }
     ]
   },
