@@ -1,7 +1,7 @@
 export const prodUrl = "https://uat-integrations.kreditmind.com/v2"
 export const devUrl = "http://localhost:5000/v2"
 
-export const currentUrl = prodUrl;
+export const currentUrl = devUrl;
 
 export const lentra_documents = [
     "PAN",
