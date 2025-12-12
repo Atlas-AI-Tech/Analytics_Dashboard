@@ -17,8 +17,10 @@ import { currentUrl } from './constant';
 const MOCK_FLOW_IDS = [];
 const API_ENDPOINT = `${currentUrl}/verification/analytics/flow-files`;
 const MEDIAN_API_ENDPOINT = `${currentUrl}/verification/analytics/flow-medians`;
+const LOS_LOCAL_API_ENDPOINT = "http://localhost:5000"
+const LOS_PROD_API_ENDPOINT = "https://uat-lentra-los.kreditmind.com"
 const LOS_API_ENDPOINT =
-  'http://localhost:5000/v3/verification/analytics/get-analytics';
+  `${LOS_PROD_API_ENDPOINT}/v3/verification/analytics`;
 
 const formatTimeValue = (value, timeUnit) => {
   if (value == null || value === '') return '—';
@@ -532,14 +534,14 @@ const LentraV2Tracker = ({ initialFlowId }) => {
                     <ArrowUpDown size={16} />
                     Show in {timeUnit === 'seconds' ? 'Milliseconds' : 'Seconds'}
                   </button>
-                  <button
+                  {/*<button
                     type="button"
                     onClick={downloadCSV}
                     className="inline-flex items-center gap-2 rounded-lg border border-[#3a9391]/60 bg-[#3a9391] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#347f7d]"
                   >
                     <Download size={16} />
                     Download CSV
-                  </button>
+                  </button>*/}
                 </div>
               </div>
 
@@ -1023,6 +1025,7 @@ const LentraLOSTracker = ({ initialFlowId }) => {
                 <ArrowUpDown size={16} />
                 Show in {timeUnit === 'seconds' ? 'Milliseconds' : 'Seconds'}
               </button>
+              {/*
               <button
                 type="button"
                 onClick={downloadCSV}
@@ -1031,6 +1034,7 @@ const LentraLOSTracker = ({ initialFlowId }) => {
                 <Download size={16} />
                 Download CSV
               </button>
+              */}
             </div>
           </div>
 
