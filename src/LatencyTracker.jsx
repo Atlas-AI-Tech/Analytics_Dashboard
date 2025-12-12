@@ -20,7 +20,7 @@ const MEDIAN_API_ENDPOINT = `${currentUrl}/verification/analytics/flow-medians`;
 const LOS_LOCAL_API_ENDPOINT = "http://localhost:5000"
 const LOS_PROD_API_ENDPOINT = "https://uat-lentra-los.kreditmind.com"
 const LOS_API_ENDPOINT =
-  `${LOS_PROD_API_ENDPOINT}/v3/verification/analytics`;
+  `${LOS_LOCAL_API_ENDPOINT}/v3/verification/analytics`;
 
 const formatTimeValue = (value, timeUnit) => {
   if (value == null || value === '') return '—';
@@ -717,7 +717,7 @@ const LentraV2Tracker = ({ initialFlowId }) => {
   );
 };
 
-const LentraLOSTracker = ({ initialFlowId }) => {
+const LentraPFLCDLTracker = ({ initialFlowId }) => {
   const [flowIdInput, setFlowIdInput] = useState(initialFlowId);
   const [activeFlowId, setActiveFlowId] = useState(initialFlowId);
   const [metrics, setMetrics] = useState([]);
@@ -1119,7 +1119,7 @@ const LatencyTracker = ({ flowId: initialFlowId = '' }) => {
   const [productType, setProductType] = useState('lentraV2');
   const productOptions = [
     { key: 'lentraV2', label: 'Lentra V2' },
-    { key: 'lentraLOS', label: 'Lentra LOS' },
+    { key: 'lentraPFLCDL', label: 'Lentra PFL CDL' },
   ];
 
   return (
@@ -1148,7 +1148,7 @@ const LatencyTracker = ({ flowId: initialFlowId = '' }) => {
         {productType === 'lentraV2' ? (
           <LentraV2Tracker initialFlowId={initialFlowId} />
         ) : (
-          <LentraLOSTracker initialFlowId={initialFlowId} />
+          <LentraPFLCDLTracker initialFlowId={initialFlowId} />
         )}
       </div>
     </section>
