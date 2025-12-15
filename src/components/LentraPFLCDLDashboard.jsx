@@ -4,7 +4,7 @@ import { Calendar, Info, ChevronDown, ChevronRight } from 'lucide-react';
 const PFL_CDL_LOCAL_API_ENDPOINT = "http://localhost:5000"
 const PFL_CDL_PROD_API_ENDPOINT = "https://uat-lentra-los.kreditmind.com"
 const PFL_CDL_API_ENDPOINT =
-  `${PFL_CDL_LOCAL_API_ENDPOINT}/v3/verification/analytics/documents/summary`;
+  `${PFL_CDL_PROD_API_ENDPOINT}/v3/verification/analytics/documents/summary`;
 
 // Status descriptions mapping
 const STATUS_DESCRIPTIONS = {
@@ -14,16 +14,17 @@ const STATUS_DESCRIPTIONS = {
     inprogress: "Document upload is in progress into Atlas's server"
   },
   sage_processing: {
-    success: "Atlas was successfully able to parse the given document",
-    inprogress: "Given document is in parsing processing",
-    failed: "Failed due to server error",
-    unrecognised: "Failed due to Unrecognised document"
+    success: "Processing was successfully completed",
+    inprogress: "Processing is in progress",
+    failed: "Processing failed due to internal server error",
+    unrecognised: "Processing was successfully completed but the document was unrecognised"
   },
   callbacks: {
     initiated: "Callback is initiated",
-    delivered: "Callback sent successfully",
-    inprogress: "Callback in progress",
-    auth_failed: "Auth Failed before sending the callback"
+    delivered: "Callback was sent successfully",
+    inprogress: "Callback is in progress",
+    auth_failed: "Authentication failed before sending the callback",
+    callback_failed: "Callback was not sent due to internal server error"
   }
 };
 
@@ -57,7 +58,7 @@ const InfoTooltip = ({ description }) => {
 };
 
 // Status Node Component (Leaf nodes)
-const StatusNode = ({ label, data, description, showPageCount = true, color = '#d1d5db' }) => {
+const StatusNode = ({ label, data, description, showPageCount = true, color = '#d1d5db', countLabel = 'Count:' }) => {
   const formattedLabel = label.charAt(0).toUpperCase() + label.slice(1).replace(/_/g, ' ');
 
   return (
@@ -73,7 +74,7 @@ const StatusNode = ({ label, data, description, showPageCount = true, color = '#
       </div>
       <div className="space-y-0.5">
         <div className="flex justify-between items-center">
-          <span className="text-xs text-gray-600">Count:</span>
+          <span className="text-xs text-gray-600">{countLabel}</span>
           <span className="text-sm font-bold text-gray-800">{data?.count || data?.document_count || 0}</span>
         </div>
         {showPageCount && data?.page_count !== undefined && (
@@ -97,26 +98,18 @@ const SectionNode = ({
   showPageCount = true,
   color = '#d1d5db'
 }) => {
-  // both starts opened by default
+  // starts opened by default
   const [isExpanded, setIsExpanded] = useState(true);
-  const [isTotalExpanded, setIsTotalExpanded] = useState(true);
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
-    // Nested total should only expand if parent is being opened, otherwise don't auto-reopen
-    if (!isExpanded && !isTotalExpanded) {
-      setIsTotalExpanded(true);
-    }
-  };
-
-  const toggleTotalExpand = () => {
-    setIsTotalExpanded(!isTotalExpanded);
   };
 
   // For Callback section, instead of "Documents", call it "Callback Entries"
   const isCallbackSection = title === "Callbacks";
   const documentsLabel = isCallbackSection ? "Callback Entries" : "Documents";
-  const countLabel = isCallbackSection ? "Entries" : "Count";
+  // For cards: "Document:" for Upload and Sage Processing, "Count:" for Callbacks
+  const cardCountLabel = isCallbackSection ? "Count:" : "Documents:";
 
   return (
     <div className="w-full">
@@ -158,63 +151,20 @@ const SectionNode = ({
         </div>
       </div>
 
-      {/* Expanded Content */}
-      {isExpanded && (
-        <div className="ml-6 mb-4 space-y-4">
-          {/* Documents or Callback Entries Node */}
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleTotalExpand();
-            }}
-            className="bg-gray-50 rounded-lg p-3 shadow-sm border-l-4 transition-all hover:shadow cursor-pointer"
-            style={{ borderColor: color }}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                {isTotalExpanded ? (
-                  <ChevronDown size={18} className="text-gray-600" />
-                ) : (
-                  <ChevronRight size={18} className="text-gray-600" />
-                )}
-                <h3 className="text-base font-semibold text-gray-800">
-                  {documentsLabel}
-                </h3>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <div className="text-xs text-gray-600 mb-0.5">{countLabel}</div>
-                  <div className="text-xl font-bold text-gray-800">
-                    {totalData?.count || totalData?.document_count || 0}
-                  </div>
-                </div>
-                {showPageCount && totalData?.page_count !== undefined && (
-                  <div className="text-right">
-                    <div className="text-xs text-gray-600 mb-0.5">Pages</div>
-                    <div className="text-xl font-bold text-gray-800">
-                      {totalData.page_count}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Status Nodes */}
-          {isTotalExpanded && summaryData && (
-            <div className="ml-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Object.entries(summaryData).map(([status, data]) => (
-                <StatusNode
-                  key={status}
-                  label={status}
-                  data={data}
-                  description={statusDescriptions?.[status]}
-                  showPageCount={showPageCount}
-                  color={color}
-                />
-              ))}
-            </div>
-          )}
+      {/* Expanded Content - Status Cards */}
+      {isExpanded && summaryData && (
+        <div className="ml-6 mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Object.entries(summaryData).map(([status, data]) => (
+            <StatusNode
+              key={status}
+              label={status}
+              data={data}
+              description={statusDescriptions?.[status]}
+              showPageCount={showPageCount}
+              color={color}
+              countLabel={cardCountLabel}
+            />
+          ))}
         </div>
       )}
     </div>
