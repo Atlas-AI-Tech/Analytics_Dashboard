@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Info, ChevronDown, ChevronRight } from 'lucide-react';
-
-const PFL_CDL_LOCAL_API_ENDPOINT = "http://localhost:5000"
-const PFL_CDL_PROD_API_ENDPOINT = "https://uat-lentra-los.kreditmind.com"
-const PFL_CDL_API_ENDPOINT =
-  `${PFL_CDL_PROD_API_ENDPOINT}/v3/verification/analytics/documents/summary`;
+import {
+  SANDBOXES,
+  DEFAULT_ENVIRONMENT,
+  getPflCdlSummaryUrl,
+} from '../constant';
 
 // Status descriptions mapping
 const STATUS_DESCRIPTIONS = {
@@ -264,7 +264,7 @@ const FunnelView = ({ data }) => {
   );
 };
 
-const LentraPFLCDLDashboard = () => {
+const LentraPFLCDLDashboard = ({ sandbox = SANDBOXES.LENTRA }) => {
   const [dateFilter, setDateFilter] = useState('lifetime');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -274,7 +274,8 @@ const LentraPFLCDLDashboard = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${PFL_CDL_API_ENDPOINT}`);
+      const url = getPflCdlSummaryUrl(sandbox, DEFAULT_ENVIRONMENT);
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
@@ -289,8 +290,10 @@ const LentraPFLCDLDashboard = () => {
   };
 
   useEffect(() => {
+    // Clear previous data when sandbox or filter changes to avoid stale view
+    setData(null);
     fetchPFLCDLData();
-  }, [dateFilter]);
+  }, [dateFilter, sandbox]);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">

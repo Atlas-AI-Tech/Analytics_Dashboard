@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, TrendingUp, FileText, CheckCircle, XCircle } from 'lucide-react';
-import { currentUrl } from '../constant';
+import {
+  SANDBOXES,
+  PRODUCT_TYPES,
+  DEFAULT_ENVIRONMENT,
+  getLentraV2BaseUrl,
+  lentraV2AnalyticsPath,
+} from '../constant';
 
-const LentraV2Dashboard = () => {
+const LentraV2Dashboard = ({ sandbox = SANDBOXES.LENTRA }) => {
   const [analyticsData, setAnalyticsData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -16,7 +22,9 @@ const LentraV2Dashboard = () => {
     setError(null);
     setDateError('');
 
-    let url = `${currentUrl}/verification/analytics?product_name=lentra_v2&date_filter_type=${dateFilter}`;
+    const baseUrl = getLentraV2BaseUrl(sandbox, DEFAULT_ENVIRONMENT);
+
+    let url = `${baseUrl}${lentraV2AnalyticsPath}?product_name=${PRODUCT_TYPES.LENTRA_V2}&date_filter_type=${dateFilter}`;
     
     if (dateFilter === 'date_range') {
       if (!startDate || !endDate) {
@@ -51,11 +59,14 @@ const LentraV2Dashboard = () => {
     }
   };
 
+  // Automatically refetch when date filter OR sandbox changes (except for manual date_range)
   useEffect(() => {
     if (dateFilter !== 'date_range') {
+      // Clear previous data while new sandbox/filter loads
+      setAnalyticsData(null);
       fetchAnalytics();
     }
-  }, [dateFilter]);
+  }, [dateFilter, sandbox]);
 
   const handleDateFilterChange = (filter) => {
     setDateFilter(filter);
