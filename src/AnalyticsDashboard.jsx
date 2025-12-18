@@ -50,7 +50,7 @@ const AnalyticsDashboard = () => {
           </div>
 
           {/* Product Selector */}
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Product Type</h2>
+          <h2 className="text-lg font-semibold text-gray-800 mb-4 mt-8">Product Type</h2>
           <div className="flex flex-wrap gap-3">
           <button
               onClick={() => handleProductChange(PRODUCT_TYPES.PFL_CDL)}

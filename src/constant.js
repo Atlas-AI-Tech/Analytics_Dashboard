@@ -120,3 +120,49 @@ export const getPflCdlSummaryUrl = (
 
   return `${base}${pflCdlSummaryPath}`;
 };
+
+// ---------------------------------------------------------------------------
+// Latency tracker specific endpoints
+// ---------------------------------------------------------------------------
+
+// Lentra V2 flow latency (per sandbox & environment)
+export const lentraV2FlowFilesPath = "/verification/analytics/flow-files";
+export const lentraV2FlowMediansPath = "/verification/analytics/flow-medians";
+
+export const getLentraV2FlowFilesUrl = (
+  sandbox = SANDBOXES.LENTRA,
+  environment = DEFAULT_ENVIRONMENT
+) => {
+  const base = getLentraV2BaseUrl(sandbox, environment);
+  return `${base}${lentraV2FlowFilesPath}`;
+};
+
+export const getLentraV2FlowMediansUrl = (
+  sandbox = SANDBOXES.LENTRA,
+  environment = DEFAULT_ENVIRONMENT
+) => {
+  const base = getLentraV2BaseUrl(sandbox, environment);
+  return `${base}${lentraV2FlowMediansPath}`;
+};
+
+// LOS / PFL CDL latency analytics (per sandbox & environment)
+// We piggyback on the existing PFL CDL base links for consistency.
+export const losAnalyticsPath = "/v3/verification/analytics";
+
+export const getLosAnalyticsBaseUrl = (
+  sandbox = SANDBOXES.LENTRA,
+  environment = DEFAULT_ENVIRONMENT
+) => {
+  const base =
+    pflCdlBaseLinks[sandbox]?.[environment] ??
+    pflCdlBaseLinks[SANDBOXES.LENTRA][ENVIRONMENTS.PROD];
+  return base;
+};
+
+export const getLosAnalyticsUrl = (
+  sandbox = SANDBOXES.LENTRA,
+  environment = DEFAULT_ENVIRONMENT
+) => {
+  const base = getLosAnalyticsBaseUrl(sandbox, environment);
+  return `${base}${losAnalyticsPath}`;
+};

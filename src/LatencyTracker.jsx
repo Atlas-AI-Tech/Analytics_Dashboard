@@ -12,15 +12,17 @@ import {
   Loader2,
   RefreshCcw,
 } from 'lucide-react';
-import { currentUrl } from './constant';
+import {
+  ENVIRONMENTS,
+  SANDBOXES,
+  PRODUCT_TYPES,
+  DEFAULT_ENVIRONMENT,
+  getLentraV2FlowFilesUrl,
+  getLentraV2FlowMediansUrl,
+  getLosAnalyticsUrl,
+} from './constant';
 
 const MOCK_FLOW_IDS = [];
-const API_ENDPOINT = `${currentUrl}/verification/analytics/flow-files`;
-const MEDIAN_API_ENDPOINT = `${currentUrl}/verification/analytics/flow-medians`;
-const LOS_LOCAL_API_ENDPOINT = "http://localhost:5000"
-const LOS_PROD_API_ENDPOINT = "https://uat-lentra-los.kreditmind.com"
-const LOS_API_ENDPOINT =
-  `${LOS_LOCAL_API_ENDPOINT}/v3/verification/analytics`;
 
 const formatTimeValue = (value, timeUnit) => {
   if (value == null || value === '') return '—';
@@ -32,7 +34,7 @@ const formatTimeValue = (value, timeUnit) => {
   return numValue;
 };
 
-const LentraV2Tracker = ({ initialFlowId }) => {
+const LentraV2Tracker = ({ initialFlowId, sandbox }) => {
   const [trackingMode, setTrackingMode] = useState('flow_uuid');
   const [flowIdInput, setFlowIdInput] = useState(initialFlowId);
   const [activeFlowId, setActiveFlowId] = useState(initialFlowId);
@@ -95,7 +97,11 @@ const LentraV2Tracker = ({ initialFlowId }) => {
     setUsingMockData(false);
     setError(null);
     try {
-      const url = `${API_ENDPOINT}?flow_uuid=${encodeURIComponent(flow)}`;
+      const baseUrl = getLentraV2FlowFilesUrl(
+        sandbox,
+        DEFAULT_ENVIRONMENT,
+      );
+      const url = `${baseUrl}?flow_uuid=${encodeURIComponent(flow)}`;
       const response = await fetch(url, {
         method: 'GET',
       });
@@ -135,13 +141,17 @@ const LentraV2Tracker = ({ initialFlowId }) => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [sandbox]);
 
   const fetchMedians = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(MEDIAN_API_ENDPOINT, {
+      const url = getLentraV2FlowMediansUrl(
+        sandbox,
+        DEFAULT_ENVIRONMENT,
+      );
+      const response = await fetch(url, {
         method: 'GET',
       });
       if (!response.ok) {
@@ -156,7 +166,7 @@ const LentraV2Tracker = ({ initialFlowId }) => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [sandbox]);
 
   useEffect(() => {
     if (trackingMode === 'median') {
@@ -717,7 +727,7 @@ const LentraV2Tracker = ({ initialFlowId }) => {
   );
 };
 
-const LentraPFLCDLTracker = ({ initialFlowId }) => {
+const LentraPFLCDLTracker = ({ initialFlowId, sandbox }) => {
   const [flowIdInput, setFlowIdInput] = useState(initialFlowId);
   const [activeFlowId, setActiveFlowId] = useState(initialFlowId);
   const [metrics, setMetrics] = useState([]);
@@ -780,7 +790,11 @@ const LentraPFLCDLTracker = ({ initialFlowId }) => {
     setLoading(true);
     setError(null);
     try {
-      const url = `${LOS_API_ENDPOINT}?flow_uuid=${encodeURIComponent(flow)}`;
+      const baseUrl = getLosAnalyticsUrl(
+        sandbox,
+        DEFAULT_ENVIRONMENT,
+      );
+      const url = `${baseUrl}?flow_uuid=${encodeURIComponent(flow)}`;
       const response = await fetch(url, { method: 'GET' });
       
       if (!response.ok) {
@@ -1116,39 +1130,100 @@ const LentraPFLCDLTracker = ({ initialFlowId }) => {
 };
 
 const LatencyTracker = ({ flowId: initialFlowId = '' }) => {
-  const [productType, setProductType] = useState('lentraV2');
-  const productOptions = [
-    { key: 'lentraV2', label: 'Lentra V2' },
-    { key: 'lentraPFLCDL', label: 'Lentra PFL CDL' },
-  ];
+  const [selectedSandbox, setSelectedSandbox] = useState(SANDBOXES.LENTRA);
+  const [selectedProduct, setSelectedProduct] = useState(PRODUCT_TYPES.PFL_CDL);
+
+  const handleSandboxChange = (sandbox) => {
+    setSelectedSandbox(sandbox);
+
+    // Mirror AnalyticsDashboard behaviour:
+    // When switching to Lentra sandbox, Lentra V2 product should not be selectable
+    if (sandbox === SANDBOXES.LENTRA && selectedProduct === PRODUCT_TYPES.LENTRA_V2) {
+      setSelectedProduct(PRODUCT_TYPES.PFL_CDL);
+    }
+  };
+
+  const handleProductChange = (product) => {
+    setSelectedProduct(product);
+  };
 
   return (
     <section className="min-h-screen bg-gray-50 py-8">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="mb-6 flex items-center gap-4 rounded-2xl border border-[#3a9391]/20 bg-white p-4 shadow-md">
-          <span className="text-sm font-medium text-gray-700">Product Type:</span>
-          <div className="flex gap-2">
-            {productOptions.map((option) => (
+        {/* Sandbox selector */}
+        <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-[#3a9391]/20 bg-white p-4 shadow-md">
+          <div>
+            <span className="text-sm font-medium text-gray-700">Sandbox Environment:</span>
+            <div className="mt-2 flex flex-wrap gap-2">
               <button
-                key={option.key}
                 type="button"
-                onClick={() => setProductType(option.key)}
+                onClick={() => handleSandboxChange(SANDBOXES.LENTRA)}
                 className={`rounded-lg px-4 py-2 cursor-pointer text-sm font-medium transition ${
-                  productType === option.key
+                  selectedSandbox === SANDBOXES.LENTRA
                     ? 'bg-[#3a9391] text-white shadow-sm'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                {option.label}
+                Lentra
               </button>
-            ))}
+              <button
+                type="button"
+                onClick={() => handleSandboxChange(SANDBOXES.ATLAS)}
+                className={`rounded-lg px-4 py-2 cursor-pointer text-sm font-medium transition ${
+                  selectedSandbox === SANDBOXES.ATLAS
+                    ? 'bg-[#3a9391] text-white shadow-sm'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Atlas
+              </button>
+            </div>
+          </div>
+
+          {/* Product selector */}
+          <div>
+            <span className="text-sm font-medium text-gray-700">Product Type:</span>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => handleProductChange(PRODUCT_TYPES.PFL_CDL)}
+                className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+                  selectedProduct === PRODUCT_TYPES.PFL_CDL
+                    ? 'bg-[#3a9391] text-white shadow-sm'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Lentra PFL CDL
+              </button>
+              <button
+                type="button"
+                onClick={() => handleProductChange(PRODUCT_TYPES.LENTRA_V2)}
+                disabled={selectedSandbox === SANDBOXES.LENTRA}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  selectedSandbox === SANDBOXES.LENTRA
+                    ? 'cursor-not-allowed bg-gray-100 text-gray-400 opacity-60'
+                    : selectedProduct === PRODUCT_TYPES.LENTRA_V2
+                      ? 'cursor-pointer bg-[#3a9391] text-white shadow-sm'
+                      : 'cursor-pointer bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Lentra V2
+              </button>
+            </div>
           </div>
         </div>
 
-        {productType === 'lentraV2' ? (
-          <LentraV2Tracker initialFlowId={initialFlowId} />
-        ) : (
-          <LentraPFLCDLTracker initialFlowId={initialFlowId} />
+        {selectedProduct === PRODUCT_TYPES.LENTRA_V2 && (
+          <LentraV2Tracker
+            initialFlowId={initialFlowId}
+            sandbox={selectedSandbox}
+          />
+        )}
+        {selectedProduct === PRODUCT_TYPES.PFL_CDL && (
+          <LentraPFLCDLTracker
+            initialFlowId={initialFlowId}
+            sandbox={selectedSandbox}
+          />
         )}
       </div>
     </section>

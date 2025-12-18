@@ -28,12 +28,12 @@ const Navbar = ({ title = "Analytics Dashboard for Atlas AI 🚀" }) => {
             >
               Api Latency Tracker
             </button>
-            <button 
+            {/* <button 
               onClick={() => navigate('/fieldwise-analytics')} 
               className="px-6 h-[40px] cursor-pointer py-2 bg-[#3a9391] text-white rounded-lg font-medium hover:bg-[#3a9391] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
             >
               View Fieldwise Analytics
-            </button>
+            </button> */}
           </>
         )}
       </div>
