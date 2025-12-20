@@ -55,14 +55,14 @@ const FieldwiseAnalyticsDashboard = () => {
         if (value >= 90) return 'text-[#3a9391]';
         if (value >= 80) return 'text-blue-600';
         if (value >= 70) return 'text-yellow-600';
-        return 'text-red-600';
+        return 'text-[#d93e3e]';
     };
 
     const getBarColorClass = (value) => {
         if (value >= 90) return 'bg-[#3a9391]';
         if (value >= 80) return 'bg-blue-500';
         if (value >= 70) return 'bg-yellow-500';
-        return 'bg-red-500';
+        return 'bg-[#d93e3e]';
     };
 
     return (

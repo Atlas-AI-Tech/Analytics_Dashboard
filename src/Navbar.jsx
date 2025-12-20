@@ -8,13 +8,18 @@ const Navbar = ({ title = "Analytics Dashboard for Atlas AI 🚀" }) => {
   const isLatencyTrackerPage = location.pathname === '/api-latency-tracker';
   const showBackButton = isFieldwisePage || isLatencyTrackerPage;
 
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    navigate('/login', { replace: true });
+  };
+
   return (
     <div className="flex justify-between items-center h-[70px] px-20 bg-white shadow-[0_4px_16px_0_rgba(0,0,0,0.10)] z-30 relative">
       <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
       <div className="flex items-center gap-3">
         {showBackButton ? (
           <button 
-            onClick={() => navigate('/')} 
+            onClick={() => navigate('/dashboard')} 
             className="px-6 h-[40px] cursor-pointer py-2 bg-[#3a9391] text-white rounded-lg font-medium hover:bg-[#3a9391] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
           >
             <span>←</span>
@@ -36,6 +41,12 @@ const Navbar = ({ title = "Analytics Dashboard for Atlas AI 🚀" }) => {
             </button> */}
           </>
         )}
+        <button 
+          onClick={handleLogout}
+          className="px-6 h-[40px] cursor-pointer py-2 bg-[#d93e3e] text-white rounded-lg font-medium hover:bg-[#d93e3e] transition-colors flex items-center gap-2"
+        >
+          Logout
+        </button>
       </div>
     </div>
   );
