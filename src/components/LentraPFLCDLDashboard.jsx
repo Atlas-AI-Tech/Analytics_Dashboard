@@ -266,6 +266,9 @@ const FunnelView = ({ data }) => {
 
 const LentraPFLCDLDashboard = ({ sandbox = SANDBOXES.LENTRA }) => {
   const [dateFilter, setDateFilter] = useState('lifetime');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [dateError, setDateError] = useState('');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -273,8 +276,29 @@ const LentraPFLCDLDashboard = ({ sandbox = SANDBOXES.LENTRA }) => {
   const fetchPFLCDLData = async () => {
     setLoading(true);
     setError(null);
+    setDateError('');
+
+    const baseUrl = getPflCdlSummaryUrl(sandbox, DEFAULT_ENVIRONMENT);
+
+    let url = `${baseUrl}?date_filter_type=${dateFilter}`;
+
+    if (dateFilter === 'date_range') {
+      if (!startDate || !endDate) {
+        setDateError('Please select both start and end dates');
+        setLoading(false);
+        return;
+      }
+
+      if (new Date(startDate) > new Date(endDate)) {
+        setDateError('Start date cannot be greater than end date');
+        setLoading(false);
+        return;
+      }
+
+      url += `&start_date=${startDate}&end_date=${endDate}`;
+    }
+
     try {
-      const url = getPflCdlSummaryUrl(sandbox, DEFAULT_ENVIRONMENT);
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch data');
@@ -289,20 +313,42 @@ const LentraPFLCDLDashboard = ({ sandbox = SANDBOXES.LENTRA }) => {
     }
   };
 
+  // Reset date filter to lifetime when sandbox changes
   useEffect(() => {
-    // Clear previous data when sandbox or filter changes to avoid stale view
-    setData(null);
-    fetchPFLCDLData();
+    setDateFilter('lifetime');
+    setDateError('');
+    setStartDate('');
+    setEndDate('');
+  }, [sandbox]);
+
+  // Automatically refetch when date filter OR sandbox changes (except for manual date_range)
+  useEffect(() => {
+    if (dateFilter !== 'date_range') {
+      // Clear previous data while new sandbox/filter loads
+      setData(null);
+      fetchPFLCDLData();
+    }
   }, [dateFilter, sandbox]);
+
+  const handleDateFilterChange = (filter) => {
+    setDateFilter(filter);
+    setDateError('');
+    setStartDate('');
+    setEndDate('');
+  };
+
+  const handleDateRangeSubmit = () => {
+    fetchPFLCDLData();
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Date Filter Pills */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
           <div className="flex flex-wrap gap-3 mb-4">
             <button
-              onClick={() => setDateFilter('lifetime')}
+              onClick={() => handleDateFilterChange('lifetime')}
               className={`px-6 py-2 rounded-full font-medium transition-all cursor-pointer ${
                 dateFilter === 'lifetime'
                   ? 'bg-[#3a9391] text-white shadow-md'
@@ -312,19 +358,69 @@ const LentraPFLCDLDashboard = ({ sandbox = SANDBOXES.LENTRA }) => {
               Lifetime Data
             </button>
             <button
-              disabled
-              className="px-6 py-2 rounded-full font-medium transition-all cursor-not-allowed bg-gray-100 text-gray-400 opacity-60"
+              onClick={() => handleDateFilterChange('today')}
+              className={`px-6 py-2 rounded-full font-medium transition-all cursor-pointer ${
+                dateFilter === 'today'
+                  ? 'bg-[#3a9391] text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
             >
               Today's Data
             </button>
             <button
-              disabled
-              className="px-6 py-2 rounded-full font-medium transition-all cursor-not-allowed bg-gray-100 text-gray-400 opacity-60 flex items-center gap-2"
+              onClick={() => handleDateFilterChange('date_range')}
+              className={`px-6 py-2 rounded-full font-medium transition-all cursor-pointer flex items-center gap-2 ${
+                dateFilter === 'date_range'
+                  ? 'bg-[#3a9391] text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
             >
               <Calendar size={18} />
               Specific Date Range
             </button>
           </div>
+
+          {/* Date Range Picker */}
+          {dateFilter === 'date_range' && (
+            <div className="border-t pt-4 mt-4">
+              <div className="flex flex-wrap gap-4 items-end">
+                <div className="flex-1 min-w-[200px]">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    max={endDate || undefined}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div className="flex-1 min-w-[200px]">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    End Date
+                  </label>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    min={startDate || undefined}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <button
+                  onClick={handleDateRangeSubmit}
+                  disabled={!startDate || !endDate}
+                  className="px-6 py-2 bg-[#3a9391] text-white rounded-lg font-medium hover:bg-[#3a9391] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                >
+                  Apply Filter
+                </button>
+              </div>
+              {dateError && (
+                <p className="text-red-600 text-sm mt-2">{dateError}</p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Loading State */}

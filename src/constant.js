@@ -103,7 +103,7 @@ export const pflCdlBaseLinks = {
   [SANDBOXES.ATLAS]: {
     // Dummy URLs for now – can be updated independently later
     [ENVIRONMENTS.PROD]: "https://lentra-loss.dev.kreditmind.com",
-    [ENVIRONMENTS.LOCAL]: "http://localhost:7002",
+    [ENVIRONMENTS.LOCAL]: "http://localhost:5000",
   },
 };
 
