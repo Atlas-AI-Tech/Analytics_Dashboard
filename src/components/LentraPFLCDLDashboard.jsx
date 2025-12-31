@@ -4,6 +4,7 @@ import {
   SANDBOXES,
   DEFAULT_ENVIRONMENT,
   getPflCdlSummaryUrl,
+  getPflCdlClientsUrl,
 } from '../constant';
 
 // Status descriptions mapping
@@ -269,6 +270,9 @@ const LentraPFLCDLDashboard = ({ sandbox = SANDBOXES.LENTRA }) => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [dateError, setDateError] = useState('');
+  const [selectedClient, setSelectedClient] = useState('all');
+  const [clients, setClients] = useState([]);
+  const [clientsLoading, setClientsLoading] = useState(true);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -298,6 +302,12 @@ const LentraPFLCDLDashboard = ({ sandbox = SANDBOXES.LENTRA }) => {
       url += `&start_date=${startDate}&end_date=${endDate}`;
     }
 
+    // Add client_uuid parameter if a specific client is selected
+    // Note: 'all' is not sent to API, only specific client UUIDs
+    if (selectedClient && selectedClient !== 'all') {
+      url += `&client_uuid=${selectedClient}`;
+    }
+
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -313,22 +323,50 @@ const LentraPFLCDLDashboard = ({ sandbox = SANDBOXES.LENTRA }) => {
     }
   };
 
+  // Fetch clients on mount and when sandbox changes
+  useEffect(() => {
+    const fetchClients = async () => {
+      setClientsLoading(true);
+      try {
+        const clientsUrl = getPflCdlClientsUrl(sandbox, DEFAULT_ENVIRONMENT);
+        const response = await fetch(clientsUrl);
+        if (!response.ok) {
+          throw new Error('Failed to fetch clients');
+        }
+        const clientsData = await response.json();
+        // Handle both array response and object with clients array
+        const clientsList = Array.isArray(clientsData) 
+          ? clientsData 
+          : (clientsData.clients || []);
+        setClients(clientsList);
+      } catch (err) {
+        console.error('Error fetching clients:', err);
+        setClients([]); // Set empty array on error
+      } finally {
+        setClientsLoading(false);
+      }
+    };
+    
+    fetchClients();
+  }, [sandbox]);
+
   // Reset date filter to lifetime when sandbox changes
   useEffect(() => {
     setDateFilter('lifetime');
     setDateError('');
     setStartDate('');
     setEndDate('');
+    setSelectedClient('all');
   }, [sandbox]);
 
-  // Automatically refetch when date filter OR sandbox changes (except for manual date_range)
+  // Automatically refetch when date filter, client, OR sandbox changes (except for manual date_range)
   useEffect(() => {
     if (dateFilter !== 'date_range') {
       // Clear previous data while new sandbox/filter loads
       setData(null);
       fetchPFLCDLData();
     }
-  }, [dateFilter, sandbox]);
+  }, [dateFilter, selectedClient, sandbox]);
 
   const handleDateFilterChange = (filter) => {
     setDateFilter(filter);
@@ -346,7 +384,7 @@ const LentraPFLCDLDashboard = ({ sandbox = SANDBOXES.LENTRA }) => {
       <div className="max-w-7xl mx-auto">
         {/* Date Filter Pills */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <div className="flex flex-wrap gap-3 mb-4">
+          <div className="flex flex-wrap gap-3 mb-4 items-center">
             <button
               onClick={() => handleDateFilterChange('lifetime')}
               className={`px-6 py-2 rounded-full font-medium transition-all cursor-pointer ${
@@ -378,6 +416,27 @@ const LentraPFLCDLDashboard = ({ sandbox = SANDBOXES.LENTRA }) => {
               <Calendar size={18} />
               Specific Date Range
             </button>
+            
+            {/* Client Dropdown */}
+            <div className="ml-auto relative">
+              <select
+                value={selectedClient}
+                onChange={(e) => setSelectedClient(e.target.value)}
+                disabled={clientsLoading}
+                className="px-6 py-2 pr-10 rounded-full font-medium transition-all cursor-pointer bg-gray-200 text-gray-700 hover:bg-gray-200 border-0 focus:ring-2 focus:ring-[#3a9391] focus:outline-none appearance-none min-w-[160px] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <option value="all">All Clients</option>
+                {clients.map((client) => (
+                  <option key={client.uuid} value={client.uuid}>
+                    {client.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown 
+                size={18} 
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-600" 
+              />
+            </div>
           </div>
 
           {/* Date Range Picker */}

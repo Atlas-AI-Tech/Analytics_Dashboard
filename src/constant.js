@@ -46,7 +46,7 @@ export const ENVIRONMENTS = {
   PROD: "prod",
 };
 
-export const DEFAULT_ENVIRONMENT = ENVIRONMENTS.PROD;
+export const DEFAULT_ENVIRONMENT = ENVIRONMENTS.LOCAL;
 
 // Sandbox types for the Analytics dashboards
 export const SANDBOXES = {
@@ -119,6 +119,19 @@ export const getPflCdlSummaryUrl = (
     pflCdlBaseLinks[SANDBOXES.LENTRA][ENVIRONMENTS.PROD];
 
   return `${base}${pflCdlSummaryPath}`;
+};
+
+export const pflCdlClientsPath = "/v3/verification/clients";
+
+export const getPflCdlClientsUrl = (
+  sandbox = SANDBOXES.LENTRA,
+  environment = DEFAULT_ENVIRONMENT
+) => {
+  const base =
+    pflCdlBaseLinks[sandbox]?.[environment] ??
+    pflCdlBaseLinks[SANDBOXES.LENTRA][ENVIRONMENTS.PROD];
+
+  return `${base}${pflCdlClientsPath}`;
 };
 
 // ---------------------------------------------------------------------------
