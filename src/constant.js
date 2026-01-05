@@ -58,6 +58,7 @@ export const SANDBOXES = {
 export const PRODUCT_TYPES = {
   LENTRA_V2: "lentra_v2",
   PFL_CDL: "pfl_cdl",
+  BULK_SERVICE: "bulk_service",
 };
 
 // ---------------------------------------------------------------------------
@@ -178,4 +179,45 @@ export const getLosAnalyticsUrl = (
 ) => {
   const base = getLosAnalyticsBaseUrl(sandbox, environment);
   return `${base}${losAnalyticsPath}`;
+};
+
+// ---------------------------------------------------------------------------
+// Bulk Service analytics links (per sandbox & environment)
+// ---------------------------------------------------------------------------
+
+// Base URLs per sandbox for Bulk Service
+export const bulkServiceBaseLinks = {
+  [SANDBOXES.LENTRA]: {
+    [ENVIRONMENTS.PROD]: "http://k8s-default-bulkserv-657c31948c-e016666b2c06a897.elb.ap-south-1.amazonaws.com",
+    [ENVIRONMENTS.LOCAL]: "http://localhost:5000",
+  },
+  [SANDBOXES.ATLAS]: {
+    [ENVIRONMENTS.PROD]: "http://k8s-default-bulkserv-657c31948c-e016666b2c06a897.elb.ap-south-1.amazonaws.com",
+    [ENVIRONMENTS.LOCAL]: "http://localhost:5000",
+  },
+};
+
+export const bulkServiceClientsPath = "/v1/bulk/clients";
+export const bulkServiceAnalyticsPath = "/v1/bulk/analytics";
+
+export const getBulkServiceClientsUrl = (
+  sandbox = SANDBOXES.LENTRA,
+  environment = DEFAULT_ENVIRONMENT
+) => {
+  const base =
+    bulkServiceBaseLinks[sandbox]?.[environment] ??
+    bulkServiceBaseLinks[SANDBOXES.LENTRA][ENVIRONMENTS.LOCAL];
+
+  return `${base}${bulkServiceClientsPath}`;
+};
+
+export const getBulkServiceAnalyticsUrl = (
+  sandbox = SANDBOXES.LENTRA,
+  environment = DEFAULT_ENVIRONMENT
+) => {
+  const base =
+    bulkServiceBaseLinks[sandbox]?.[environment] ??
+    bulkServiceBaseLinks[SANDBOXES.LENTRA][ENVIRONMENTS.LOCAL];
+
+  return `${base}${bulkServiceAnalyticsPath}`;
 };

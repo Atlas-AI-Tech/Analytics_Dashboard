@@ -4,9 +4,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const Navbar = ({ title = "Analytics Dashboard for Atlas AI 🚀" }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const isFieldwisePage = location.pathname === '/fieldwise-analytics';
+
+  // Update logic: show back button if on latency tracker
   const isLatencyTrackerPage = location.pathname === '/api-latency-tracker';
-  const showBackButton = isFieldwisePage || isLatencyTrackerPage;
+  const showBackButton = isLatencyTrackerPage;
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');

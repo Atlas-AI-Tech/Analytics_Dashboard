@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import LentraV2Dashboard from './components/LentraV2Dashboard';
 import LentraPFLCDLDashboard from './components/LentraPFLCDLDashboard';
+import BulkServiceDashboard from './components/BulkServiceDashboard';
 import { SANDBOXES, PRODUCT_TYPES } from './constant';
 
 const AnalyticsDashboard = () => {
@@ -75,6 +76,16 @@ const AnalyticsDashboard = () => {
             >
               Lentra V2
             </button>
+            <button
+              onClick={() => handleProductChange(PRODUCT_TYPES.BULK_SERVICE)}
+              className={`px-6 py-2 rounded-full font-medium transition-all cursor-pointer ${
+                selectedProduct === PRODUCT_TYPES.BULK_SERVICE
+                  ? 'bg-[#3a9391] text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Bulk Service
+            </button>
            
           </div>
         </div>
@@ -85,6 +96,9 @@ const AnalyticsDashboard = () => {
         )}
         {selectedProduct === PRODUCT_TYPES.PFL_CDL && (
           <LentraPFLCDLDashboard sandbox={selectedSandbox} />
+        )}
+        {selectedProduct === PRODUCT_TYPES.BULK_SERVICE && (
+          <BulkServiceDashboard sandbox={selectedSandbox} />
         )}
       </div>
     </div>
