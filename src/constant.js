@@ -188,11 +188,11 @@ export const getLosAnalyticsUrl = (
 // Base URLs per sandbox for Bulk Service
 export const bulkServiceBaseLinks = {
   [SANDBOXES.LENTRA]: {
-    [ENVIRONMENTS.PROD]: "http://k8s-default-bulkserv-657c31948c-e016666b2c06a897.elb.ap-south-1.amazonaws.com",
+    [ENVIRONMENTS.PROD]: "https://google.com.com",
     [ENVIRONMENTS.LOCAL]: "http://localhost:5000",
   },
   [SANDBOXES.ATLAS]: {
-    [ENVIRONMENTS.PROD]: "http://k8s-default-bulkserv-657c31948c-e016666b2c06a897.elb.ap-south-1.amazonaws.com",
+    [ENVIRONMENTS.PROD]: "https://bulk-api.dev.kreditmind.com",
     [ENVIRONMENTS.LOCAL]: "http://localhost:5000",
   },
 };

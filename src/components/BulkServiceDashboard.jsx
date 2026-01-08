@@ -25,26 +25,25 @@ const MasterSummary = ({ data }) => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-8 border-2 border-gray-300">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Master Summary</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">
+        Upload Documents Details
+      </h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-gray-50 rounded-lg p-4">
-          <div className="text-sm text-gray-600 mb-1">Total Documents</div>
-          <div className="text-3xl font-bold text-gray-800">
-            {data.total_documents || 0}
-          </div>
-        </div>
-        <div className="bg-gray-50 rounded-lg p-4">
-          <div className="text-sm text-gray-600 mb-1">Total Pages</div>
-          <div className="text-3xl font-bold text-gray-800">
-            {data.total_pages || 0}
-          </div>
-        </div>
-        <div className="bg-gray-50 rounded-lg p-4">
-          <div className="text-sm text-gray-600 mb-1">Total Unrecognised</div>
-          <div className="text-3xl font-bold text-gray-800">
-            {data.total_unrecognised || 0}
-          </div>
-        </div>
+        <AnalyticsCard
+          title="Total Documents"
+          value={data.total_documents || 0}
+          color="#10b981"
+        />
+        <AnalyticsCard
+          title="Total Pages"
+          value={data.total_pages || 0}
+          color="#3b82f6"
+        />
+        <AnalyticsCard
+          title="Total Unrecognised"
+          value={data.total_unrecognised || 0}
+          color="#f59e0b"
+        />
       </div>
     </div>
   );
@@ -56,7 +55,7 @@ const ProcessingStatus = ({ data }) => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-8 border-2 border-gray-300">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Processing Status</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">Sage Processing Status</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <AnalyticsCard
           title="Processing Success"
@@ -106,8 +105,12 @@ const BulkServiceDashboard = ({ sandbox }) => {
     // Build URL with required client_uuid
     let url = `${baseUrl}?client_uuid=${selectedClient}`;
 
-    // Only add date parameters if date_range is selected and both dates are provided
-    if (dateFilter === 'date_range') {
+    // Add date filter parameters based on selected filter type
+    if (dateFilter === 'lifetime') {
+      url += `&date_filter_type=lifetime`;
+    } else if (dateFilter === 'today') {
+      url += `&date_filter_type=today`;
+    } else if (dateFilter === 'date_range') {
       if (!startDate || !endDate) {
         setDateError('Please select both start and end dates');
         setLoading(false);
@@ -122,7 +125,6 @@ const BulkServiceDashboard = ({ sandbox }) => {
 
       url += `&from_date=${startDate}&to_date=${endDate}`;
     }
-    // For 'lifetime' and 'today', we don't send date parameters (API handles it)
 
     try {
       const response = await fetch(url);
