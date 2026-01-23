@@ -59,7 +59,7 @@ const InfoTooltip = ({ description }) => {
 };
 
 // Status Node Component (Leaf nodes)
-const StatusNode = ({ label, data, description, showPageCount = true, color = '#d1d5db', countLabel = 'Count:' }) => {
+const StatusNode = ({ title, label, data, description, showPageCount = true, color = '#d1d5db', countLabel = 'Count:' }) => {
   const formattedLabel = label.charAt(0).toUpperCase() + label.slice(1).replace(/_/g, ' ');
 
   return (
@@ -71,7 +71,16 @@ const StatusNode = ({ label, data, description, showPageCount = true, color = '#
         <h4 className="text-sm font-semibold text-gray-800">
           {formattedLabel}
         </h4>
-        {description && <InfoTooltip description={description} />}
+        <div className='flex items-center gap-2'>
+        <button
+          onClick={() => window.location.href = `/v3-detail/${title}/${label}`}
+          style={{ backgroundColor: color }}
+          className="cursor-pointer ml-10 text-xs font-semibold text-gray-50 rounded-full px-2 py-1"
+        >
+          View Details
+        </button>
+        {/* {description && <InfoTooltip description={description} />} */}
+        </div>
       </div>
       <div className="space-y-0.5">
         <div className="flex justify-between items-center">
@@ -107,7 +116,7 @@ const SectionNode = ({
   };
 
   // For Callback section, instead of "Documents", call it "Callback Entries"
-  const isCallbackSection = title === "Callbacks";
+  const isCallbackSection = title === "callbacks";
   const documentsLabel = isCallbackSection ? "Callback Entries" : "Documents";
   // For cards: "Document:" for Upload and Sage Processing, "Count:" for Callbacks
   const cardCountLabel = isCallbackSection ? "Count:" : "Documents:";
@@ -128,7 +137,10 @@ const SectionNode = ({
               <ChevronRight size={20} className="text-gray-600" />
             )}
             <h2 className="text-xl font-bold text-gray-800">
-              {title}
+              {title
+                .replace(/-/g, ' ')
+                .replace(/\b\w/g, (c) => c.toUpperCase())
+              }
             </h2>
           </div>
           <div className="text-right">
@@ -158,6 +170,7 @@ const SectionNode = ({
           {Object.entries(summaryData).map(([status, data]) => (
             <StatusNode
               key={status}
+              title={title}
               label={status}
               data={data}
               description={statusDescriptions?.[status]}
@@ -218,7 +231,7 @@ const FunnelView = ({ data }) => {
       {data.upload && (
         <>
           <SectionNode
-            title="Upload"
+            title="upload"
             totalData={data.upload.total}
             summaryData={data.upload.summary}
             statusDescriptions={STATUS_DESCRIPTIONS.upload}
@@ -236,7 +249,7 @@ const FunnelView = ({ data }) => {
       {data.sage_processing && (
         <>
           <SectionNode
-            title="Sage Processing"
+            title="sage-processing"
             totalData={data.sage_processing.total}
             summaryData={data.sage_processing.summary}
             statusDescriptions={STATUS_DESCRIPTIONS.sage_processing}
@@ -253,7 +266,7 @@ const FunnelView = ({ data }) => {
       {/* Callbacks Section */}
       {data.callbacks && (
         <SectionNode
-          title="Callbacks"
+          title="callbacks"
           totalData={data.callbacks.total}
           summaryData={data.callbacks.summary}
           statusDescriptions={STATUS_DESCRIPTIONS.callbacks}

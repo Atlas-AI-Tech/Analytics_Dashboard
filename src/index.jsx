@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx'
 import PublicRoute from './components/PublicRoute.jsx'
 import RootRedirect from './components/RootRedirect.jsx'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import V3DetailScreen from './components/V3DetailScreen.jsx'
 
 
 const appRouter = createBrowserRouter([
@@ -46,6 +47,14 @@ const appRouter = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <LatencyTracker />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/v3-detail/:type/:status",
+        element: (
+          <ProtectedRoute>
+            <V3DetailScreen />
           </ProtectedRoute>
         ),
       },
