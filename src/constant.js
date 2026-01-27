@@ -46,7 +46,7 @@ export const ENVIRONMENTS = {
   PROD: "prod",
 };
 
-export const DEFAULT_ENVIRONMENT = ENVIRONMENTS.PROD;
+export const DEFAULT_ENVIRONMENT = ENVIRONMENTS.LOCAL;
 
 // Sandbox types for the Analytics dashboards
 export const SANDBOXES = {
@@ -179,6 +179,101 @@ export const getLosAnalyticsUrl = (
 ) => {
   const base = getLosAnalyticsBaseUrl(sandbox, environment);
   return `${base}${losAnalyticsPath}`;
+};
+
+// ---------------------------------------------------------------------------
+// V3 analytics (details table) endpoints + enums
+// ---------------------------------------------------------------------------
+
+// V3 analytics endpoint used by V3 detail screen
+export const v3AnalyticsPath = "/v3/verification/analytics/details";
+
+export const getV3AnalyticsUrl = (
+  sandbox = SANDBOXES.LENTRA,
+  environment = DEFAULT_ENVIRONMENT
+) => {
+  const base = getLosAnalyticsBaseUrl(sandbox, environment);
+  return `${base}${v3AnalyticsPath}`;
+};
+
+// V3 analytics summary spreadsheet endpoint (downloads csv as base64 JSON payload)
+export const v3AnalyticsSummarySpreadsheetPath =
+  "/v3/verification/analytics/documents/summary/spreadsheet";
+
+export const getV3AnalyticsSummarySpreadsheetUrl = (
+  sandbox = SANDBOXES.LENTRA,
+  environment = DEFAULT_ENVIRONMENT
+) => {
+  const base = getLosAnalyticsBaseUrl(sandbox, environment);
+  return `${base}${v3AnalyticsSummarySpreadsheetPath}`;
+};
+
+// Allowed analytics views for `/v3/analytics`
+export const V3_ANALYTICS_VIEWS = {
+  UPLOAD: "upload",
+  SAGE_PROCESSING: "sage-processing",
+  CALLBACKS: "callbacks",
+};
+
+// Backend status constants (must be sent EXACTLY)
+export const V3_ANALYTICS_STATUSES_BY_VIEW = {
+  [V3_ANALYTICS_VIEWS.UPLOAD]: {
+    UPLOAD_FAILED: "UPLOAD_FAILED",
+    UPLOAD_INPROGRESS: "UPLOAD_INPROGRESS",
+    UPLOAD_SUCCESS: "UPLOAD_SUCCESS",
+  },
+  [V3_ANALYTICS_VIEWS.SAGE_PROCESSING]: {
+    PROCESSING_FAILED: "PROCESSING_FAILED",
+    PROCESSING_INPROGRESS: "PROCESSING_INPROGRESS",
+    PROCESSING_SUCCESS: "PROCESSING_SUCCESS",
+    UNRECOGNISED: "UNRECOGNISED",
+  },
+  [V3_ANALYTICS_VIEWS.CALLBACKS]: {
+    AUTH_FAILED: "AUTH_FAILED",
+    CALLBACK_FAILED: "CALLBACK_FAILED",
+    DELIVERED: "DELIVERED",
+    INITIATED: "INITIATED",
+    IN_PROGRESS: "IN_PROGRESS",
+  },
+};
+
+// Summary-card status keys → backend status constants
+// (Used by LentraPFLCDLDashboard "View Details" navigation)
+export const V3_ANALYTICS_SUMMARY_STATUS_TO_BACKEND = {
+  [V3_ANALYTICS_VIEWS.UPLOAD]: {
+    failed: V3_ANALYTICS_STATUSES_BY_VIEW[V3_ANALYTICS_VIEWS.UPLOAD].UPLOAD_FAILED,
+    inprogress:
+      V3_ANALYTICS_STATUSES_BY_VIEW[V3_ANALYTICS_VIEWS.UPLOAD].UPLOAD_INPROGRESS,
+    success: V3_ANALYTICS_STATUSES_BY_VIEW[V3_ANALYTICS_VIEWS.UPLOAD].UPLOAD_SUCCESS,
+  },
+  [V3_ANALYTICS_VIEWS.SAGE_PROCESSING]: {
+    failed:
+      V3_ANALYTICS_STATUSES_BY_VIEW[V3_ANALYTICS_VIEWS.SAGE_PROCESSING]
+        .PROCESSING_FAILED,
+    inprogress:
+      V3_ANALYTICS_STATUSES_BY_VIEW[V3_ANALYTICS_VIEWS.SAGE_PROCESSING]
+        .PROCESSING_INPROGRESS,
+    success:
+      V3_ANALYTICS_STATUSES_BY_VIEW[V3_ANALYTICS_VIEWS.SAGE_PROCESSING]
+        .PROCESSING_SUCCESS,
+    unrecognised:
+      V3_ANALYTICS_STATUSES_BY_VIEW[V3_ANALYTICS_VIEWS.SAGE_PROCESSING].UNRECOGNISED,
+  },
+  [V3_ANALYTICS_VIEWS.CALLBACKS]: {
+    auth_failed:
+      V3_ANALYTICS_STATUSES_BY_VIEW[V3_ANALYTICS_VIEWS.CALLBACKS].AUTH_FAILED,
+    callback_failed:
+      V3_ANALYTICS_STATUSES_BY_VIEW[V3_ANALYTICS_VIEWS.CALLBACKS].CALLBACK_FAILED,
+    delivered: V3_ANALYTICS_STATUSES_BY_VIEW[V3_ANALYTICS_VIEWS.CALLBACKS].DELIVERED,
+    initiated: V3_ANALYTICS_STATUSES_BY_VIEW[V3_ANALYTICS_VIEWS.CALLBACKS].INITIATED,
+    inprogress:
+      V3_ANALYTICS_STATUSES_BY_VIEW[V3_ANALYTICS_VIEWS.CALLBACKS].IN_PROGRESS,
+  },
+};
+
+export const getV3AnalyticsBackendStatus = (view, summaryStatusKey) => {
+  if (!view || !summaryStatusKey) return null;
+  return V3_ANALYTICS_SUMMARY_STATUS_TO_BACKEND?.[view]?.[summaryStatusKey] ?? null;
 };
 
 // ---------------------------------------------------------------------------

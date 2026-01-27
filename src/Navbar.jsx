@@ -6,7 +6,7 @@ const Navbar = ({ title = "Analytics Dashboard for Atlas AI 🚀" }) => {
   const location = useLocation();
 
   // Update logic: show back button if on latency tracker
-  const isLatencyTrackerPage = location.pathname === '/api-latency-tracker';
+  const isLatencyTrackerPage = location.pathname === '/api-latency-tracker' || location.pathname.includes('/v3-detail/');
   const showBackButton = isLatencyTrackerPage;
 
   const handleLogout = () => {

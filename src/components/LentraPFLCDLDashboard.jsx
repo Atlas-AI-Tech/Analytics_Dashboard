@@ -5,6 +5,7 @@ import {
   DEFAULT_ENVIRONMENT,
   getPflCdlSummaryUrl,
   getPflCdlClientsUrl,
+  getV3AnalyticsBackendStatus,
 } from '../constant';
 
 // Status descriptions mapping
@@ -59,8 +60,9 @@ const InfoTooltip = ({ description }) => {
 };
 
 // Status Node Component (Leaf nodes)
-const StatusNode = ({ title, label, data, description, showPageCount = true, color = '#d1d5db', countLabel = 'Count:' }) => {
+const StatusNode = ({ sandbox, title, label, data, description, showPageCount = true, color = '#d1d5db', countLabel = 'Count:' }) => {
   const formattedLabel = label.charAt(0).toUpperCase() + label.slice(1).replace(/_/g, ' ');
+  const backendStatus = getV3AnalyticsBackendStatus(title, label);
 
   return (
     <div
@@ -73,9 +75,15 @@ const StatusNode = ({ title, label, data, description, showPageCount = true, col
         </h4>
         <div className='flex items-center gap-2'>
         <button
-          onClick={() => window.location.href = `/v3-detail/${title}/${label}`}
+          onClick={() => {
+            if (!backendStatus) return;
+            const sandboxParam = sandbox ? `?sandbox=${encodeURIComponent(sandbox)}` : "";
+            window.location.href = `/v3-detail/${title}/${backendStatus}${sandboxParam}`;
+          }}
           style={{ backgroundColor: color }}
-          className="cursor-pointer ml-10 text-xs font-semibold text-gray-50 rounded-full px-2 py-1"
+          className={`cursor-pointer ml-10 text-xs font-semibold text-gray-50 rounded-full px-2 py-1 ${
+            !backendStatus ? "opacity-50 cursor-not-allowed" : ""
+          }`}
         >
           View Details
         </button>
@@ -101,6 +109,7 @@ const StatusNode = ({ title, label, data, description, showPageCount = true, col
 // Section Node Component (Main sections with expand/collapse)
 // All accordions and nested expands will be open by default
 const SectionNode = ({
+  sandbox,
   title,
   totalData,
   summaryData,
@@ -170,6 +179,7 @@ const SectionNode = ({
           {Object.entries(summaryData).map(([status, data]) => (
             <StatusNode
               key={status}
+              sandbox={sandbox}
               title={title}
               label={status}
               data={data}
@@ -211,7 +221,7 @@ const MasterSummary = ({ data }) => {
 };
 
 // Funnel View Component
-const FunnelView = ({ data }) => {
+const FunnelView = ({ data, sandbox }) => {
   if (!data) return null;
 
   return (
@@ -231,6 +241,7 @@ const FunnelView = ({ data }) => {
       {data.upload && (
         <>
           <SectionNode
+            sandbox={sandbox}
             title="upload"
             totalData={data.upload.total}
             summaryData={data.upload.summary}
@@ -249,6 +260,7 @@ const FunnelView = ({ data }) => {
       {data.sage_processing && (
         <>
           <SectionNode
+            sandbox={sandbox}
             title="sage-processing"
             totalData={data.sage_processing.total}
             summaryData={data.sage_processing.summary}
@@ -266,6 +278,7 @@ const FunnelView = ({ data }) => {
       {/* Callbacks Section */}
       {data.callbacks && (
         <SectionNode
+          sandbox={sandbox}
           title="callbacks"
           totalData={data.callbacks.total}
           summaryData={data.callbacks.summary}
@@ -511,7 +524,7 @@ const LentraPFLCDLDashboard = ({ sandbox = SANDBOXES.LENTRA }) => {
         )}
 
         {/* Funnel View */}
-        {!loading && !error && data && <FunnelView data={data} />}
+        {!loading && !error && data && <FunnelView data={data} sandbox={sandbox} />}
       </div>
     </div>
   );
