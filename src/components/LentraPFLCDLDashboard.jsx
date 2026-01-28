@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Calendar, Info, ChevronDown, ChevronRight } from 'lucide-react';
 import {
   SANDBOXES,
@@ -63,6 +64,7 @@ const InfoTooltip = ({ description }) => {
 const StatusNode = ({ sandbox, title, label, data, description, showPageCount = true, color = '#d1d5db', countLabel = 'Count:' }) => {
   const formattedLabel = label.charAt(0).toUpperCase() + label.slice(1).replace(/_/g, ' ');
   const backendStatus = getV3AnalyticsBackendStatus(title, label);
+  const navigate = useNavigate();
 
   return (
     <div
@@ -78,7 +80,7 @@ const StatusNode = ({ sandbox, title, label, data, description, showPageCount = 
           onClick={() => {
             if (!backendStatus) return;
             const sandboxParam = sandbox ? `?sandbox=${encodeURIComponent(sandbox)}` : "";
-            window.location.href = `/v3-detail/${title}/${backendStatus}${sandboxParam}`;
+            navigate(`/v3-detail/${title}/${backendStatus}${sandboxParam}`);
           }}
           style={{ backgroundColor: color }}
           className={`cursor-pointer ml-10 text-xs font-semibold text-gray-50 rounded-full px-2 py-1 ${

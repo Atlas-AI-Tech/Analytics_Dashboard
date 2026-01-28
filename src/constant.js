@@ -46,7 +46,7 @@ export const ENVIRONMENTS = {
   PROD: "prod",
 };
 
-export const DEFAULT_ENVIRONMENT = ENVIRONMENTS.LOCAL;
+export const DEFAULT_ENVIRONMENT = ENVIRONMENTS.PROD;
 
 // Sandbox types for the Analytics dashboards
 export const SANDBOXES = {

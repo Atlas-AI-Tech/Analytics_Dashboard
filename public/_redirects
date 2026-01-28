@@ -1,3 +1,4 @@
 /dashboard/*    /index.html   200
 /fieldwise-analytics    /   301
 /login / 301
+/v3-detail/* / 301 
