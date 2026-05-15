@@ -50,7 +50,11 @@ export const DEFAULT_ENVIRONMENT = ENVIRONMENTS.PROD;
 
 // Sandbox types for the Analytics dashboards
 export const SANDBOXES = {
+  // Keep the runtime value as "lentra" to avoid breaking existing APIs.
+  LENTRA_UAT: "lentra",
+  // Backwards-compatible alias (prefer LENTRA_UAT everywhere in code)
   LENTRA: "lentra",
+  LENTRA_PRODUCTION: "lentra_production",
   ATLAS: "atlas",
 };
 
@@ -67,7 +71,7 @@ export const PRODUCT_TYPES = {
 
 // Base URLs per sandbox for Lentra V2
 export const lentraV2BaseLinks = {
-  [SANDBOXES.LENTRA]: {
+  [SANDBOXES.LENTRA_UAT]: {
     [ENVIRONMENTS.PROD]: prodUrl, // existing production URL
     [ENVIRONMENTS.LOCAL]: devUrl, // existing local URL
   },
@@ -81,12 +85,12 @@ export const lentraV2BaseLinks = {
 export const lentraV2AnalyticsPath = "/verification/analytics";
 
 export const getLentraV2BaseUrl = (
-  sandbox = SANDBOXES.LENTRA,
+  sandbox = SANDBOXES.LENTRA_UAT,
   environment = DEFAULT_ENVIRONMENT
 ) => {
   return (
     lentraV2BaseLinks[sandbox]?.[environment] ??
-    lentraV2BaseLinks[SANDBOXES.LENTRA][ENVIRONMENTS.PROD]
+    lentraV2BaseLinks[SANDBOXES.LENTRA_UAT][ENVIRONMENTS.PROD]
   );
 };
 
@@ -96,9 +100,14 @@ export const getLentraV2BaseUrl = (
 
 // Base URLs per sandbox for PFL CDL
 export const pflCdlBaseLinks = {
-  [SANDBOXES.LENTRA]: {
+  [SANDBOXES.LENTRA_UAT]: {
     // Existing URLs used in PFL CDL dashboard
-    [ENVIRONMENTS.PROD]: "https://7104365897544.serviceurl.in",
+    [ENVIRONMENTS.PROD]: "https://997104365897544.serviceurl.in",
+    [ENVIRONMENTS.LOCAL]: "http://localhost:5000",
+  },
+  [SANDBOXES.LENTRA_PRODUCTION]: {
+    // Lentra Production (PFL CDL)
+    [ENVIRONMENTS.PROD]: "https://1676038192030.serviceurl.in",
     [ENVIRONMENTS.LOCAL]: "http://localhost:5000",
   },
   [SANDBOXES.ATLAS]: {
@@ -112,12 +121,12 @@ export const pflCdlSummaryPath =
   "/v3/verification/analytics/documents/summary";
 
 export const getPflCdlSummaryUrl = (
-  sandbox = SANDBOXES.LENTRA,
+  sandbox = SANDBOXES.LENTRA_UAT,
   environment = DEFAULT_ENVIRONMENT
 ) => {
   const base =
     pflCdlBaseLinks[sandbox]?.[environment] ??
-    pflCdlBaseLinks[SANDBOXES.LENTRA][ENVIRONMENTS.PROD];
+    pflCdlBaseLinks[SANDBOXES.LENTRA_UAT][ENVIRONMENTS.PROD];
 
   return `${base}${pflCdlSummaryPath}`;
 };
@@ -125,12 +134,12 @@ export const getPflCdlSummaryUrl = (
 export const pflCdlClientsPath = "/v3/verification/clients";
 
 export const getPflCdlClientsUrl = (
-  sandbox = SANDBOXES.LENTRA,
+  sandbox = SANDBOXES.LENTRA_UAT,
   environment = DEFAULT_ENVIRONMENT
 ) => {
   const base =
     pflCdlBaseLinks[sandbox]?.[environment] ??
-    pflCdlBaseLinks[SANDBOXES.LENTRA][ENVIRONMENTS.PROD];
+    pflCdlBaseLinks[SANDBOXES.LENTRA_UAT][ENVIRONMENTS.PROD];
 
   return `${base}${pflCdlClientsPath}`;
 };
@@ -164,17 +173,17 @@ export const getLentraV2FlowMediansUrl = (
 export const losAnalyticsPath = "/v3/verification/analytics";
 
 export const getLosAnalyticsBaseUrl = (
-  sandbox = SANDBOXES.LENTRA,
+  sandbox = SANDBOXES.LENTRA_UAT,
   environment = DEFAULT_ENVIRONMENT
 ) => {
   const base =
     pflCdlBaseLinks[sandbox]?.[environment] ??
-    pflCdlBaseLinks[SANDBOXES.LENTRA][ENVIRONMENTS.PROD];
+    pflCdlBaseLinks[SANDBOXES.LENTRA_UAT][ENVIRONMENTS.PROD];
   return base;
 };
 
 export const getLosAnalyticsUrl = (
-  sandbox = SANDBOXES.LENTRA,
+  sandbox = SANDBOXES.LENTRA_UAT,
   environment = DEFAULT_ENVIRONMENT
 ) => {
   const base = getLosAnalyticsBaseUrl(sandbox, environment);
@@ -189,7 +198,7 @@ export const getLosAnalyticsUrl = (
 export const v3AnalyticsPath = "/v3/verification/analytics/details";
 
 export const getV3AnalyticsUrl = (
-  sandbox = SANDBOXES.LENTRA,
+  sandbox = SANDBOXES.LENTRA_UAT,
   environment = DEFAULT_ENVIRONMENT
 ) => {
   const base = getLosAnalyticsBaseUrl(sandbox, environment);
@@ -201,7 +210,7 @@ export const v3AnalyticsSummarySpreadsheetPath =
   "/v3/verification/analytics/documents/summary/spreadsheet";
 
 export const getV3AnalyticsSummarySpreadsheetUrl = (
-  sandbox = SANDBOXES.LENTRA,
+  sandbox = SANDBOXES.LENTRA_UAT,
   environment = DEFAULT_ENVIRONMENT
 ) => {
   const base = getLosAnalyticsBaseUrl(sandbox, environment);
@@ -282,7 +291,7 @@ export const getV3AnalyticsBackendStatus = (view, summaryStatusKey) => {
 
 // Base URLs per sandbox for Bulk Service
 export const bulkServiceBaseLinks = {
-  [SANDBOXES.LENTRA]: {
+  [SANDBOXES.LENTRA_UAT]: {
     [ENVIRONMENTS.PROD]: "https://google.com.com",
     [ENVIRONMENTS.LOCAL]: "http://localhost:5000",
   },
@@ -296,23 +305,23 @@ export const bulkServiceClientsPath = "/v1/bulk/clients";
 export const bulkServiceAnalyticsPath = "/v1/bulk/analytics";
 
 export const getBulkServiceClientsUrl = (
-  sandbox = SANDBOXES.LENTRA,
+  sandbox = SANDBOXES.LENTRA_UAT,
   environment = DEFAULT_ENVIRONMENT
 ) => {
   const base =
     bulkServiceBaseLinks[sandbox]?.[environment] ??
-    bulkServiceBaseLinks[SANDBOXES.LENTRA][ENVIRONMENTS.LOCAL];
+    bulkServiceBaseLinks[SANDBOXES.LENTRA_UAT][ENVIRONMENTS.LOCAL];
 
   return `${base}${bulkServiceClientsPath}`;
 };
 
 export const getBulkServiceAnalyticsUrl = (
-  sandbox = SANDBOXES.LENTRA,
+  sandbox = SANDBOXES.LENTRA_UAT,
   environment = DEFAULT_ENVIRONMENT
 ) => {
   const base =
     bulkServiceBaseLinks[sandbox]?.[environment] ??
-    bulkServiceBaseLinks[SANDBOXES.LENTRA][ENVIRONMENTS.LOCAL];
+    bulkServiceBaseLinks[SANDBOXES.LENTRA_UAT][ENVIRONMENTS.LOCAL];
 
   return `${base}${bulkServiceAnalyticsPath}`;
 };
