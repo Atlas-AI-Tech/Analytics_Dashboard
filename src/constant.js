@@ -102,7 +102,7 @@ export const getLentraV2BaseUrl = (
 export const pflCdlBaseLinks = {
   [SANDBOXES.LENTRA_UAT]: {
     // Existing URLs used in PFL CDL dashboard
-    [ENVIRONMENTS.PROD]: "https://997104365897544.serviceurl.in",
+    [ENVIRONMENTS.PROD]: "https://7104365897544.serviceurl.in",
     [ENVIRONMENTS.LOCAL]: "http://localhost:5000",
   },
   [SANDBOXES.LENTRA_PRODUCTION]: {
