@@ -15,7 +15,7 @@ const Login = () => {
     setError(null);
 
     try {
-      const response = await fetch('https://dev4.kreditmind.com/analytics/login', {
+      const response = await fetch('https://gpu-dev.kreditmind.com/analytics/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

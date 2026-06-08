@@ -17,7 +17,7 @@ const ProtectedRoute = ({ children }) => {
       }
 
       try {
-        const response = await fetch('https://dev4.kreditmind.com/analytics/validate-token', {
+        const response = await fetch('https://gpu-dev.kreditmind.com/analytics/validate-token', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
